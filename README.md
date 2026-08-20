@@ -9,8 +9,8 @@ A Streamlit-based online assessment application for **GLT 302 — GENERAL INSTRU
 | Course | GLT 302 — GENERAL INSTRUMENTATION |
 | Programme | HND 1 — BIOCHEMISTRY |
 | Institution | FPA |
-| Test date | 22 August 2026 |
-| Overall access window | 9:00 AM – 11:00 AM |
+| Test date | 21 August 2026 |
+| Overall access window | 8:00 AM – 10:00 AM |
 | Individual test duration | 8 minutes |
 | Question bank | 40 questions |
 | Questions per student | 20 |
@@ -39,10 +39,10 @@ This gives **156 authorized students** because the final student `0301` is addit
 
 | Batch | Students | Access time |
 |---|---:|---|
-| Batch 1 | 40 | 9:00 AM – 9:30 AM |
-| Batch 2 | 40 | 9:31 AM – 10:00 AM |
-| Batch 3 | 40 | 10:01 AM – 10:30 AM |
-| Batch 4 | 36 | 10:31 AM – 11:00 AM |
+| Batch 1 | 40 | 8:00 AM – 8:30 AM |
+| Batch 2 | 40 | 8:31 AM – 9:00 AM |
+| Batch 3 | 40 | 9:01 AM – 9:30 AM |
+| Batch 4 | 36 | 9:31 AM – 10:00 AM |
 
 Batch 4 contains the final student `FPA/BC/25/3-0301`.
 
@@ -289,14 +289,14 @@ Before the examination begins, the lecturer should test:
 
 ### Batch timing
 
-- [ ] Batch 1 opens at 9:00 AM
-- [ ] Batch 1 closes at 9:30 AM
-- [ ] Batch 2 opens at 9:31 AM
-- [ ] Batch 2 closes at 10:00 AM
-- [ ] Batch 3 opens at 10:01 AM
-- [ ] Batch 3 closes at 10:30 AM
-- [ ] Batch 4 opens at 10:31 AM
-- [ ] Batch 4 closes at 11:00 AM
+- [ ] Batch 1 opens at 8:00 AM
+- [ ] Batch 1 closes at 8:30 AM
+- [ ] Batch 2 opens at 8:31 AM
+- [ ] Batch 2 closes at 9:00 AM
+- [ ] Batch 3 opens at 9:01 AM
+- [ ] Batch 3 closes at 9:30 AM
+- [ ] Batch 4 opens at 9:31 AM
+- [ ] Batch 4 closes at 10:00 AM
 - [ ] Student cannot enter outside the assigned window
 
 ### Examination
@@ -380,3 +380,13 @@ Do not expose:
 - student result data.
 
 Keep a backup of the results CSV throughout the assessment period.
+
+## Matriculation Number Requirement
+
+The **MATRIC NUMBER must contain exactly 16 characters**.
+
+Required format:
+
+`FPA/BC/25/3-0001`
+
+The application validates the complete 16-character format and rejects entries that do not match it.

@@ -24,9 +24,9 @@ COURSE_CODE = "GLT 302"
 COURSE_TITLE = "GENERAL INSTRUMENTATION"
 LEVEL = "HND 1"
 DEPARTMENT = "BIOCHEMISTRY"
-TEST_DATE = "2026-08-22"
+TEST_DATE = "2026-08-21"
 LOCAL_TIMEZONE = ZoneInfo("Africa/Lagos")
-TOTAL_STUDENTS = 94
+TOTAL_STUDENTS = 156
 TOTAL_QUESTION_BANK = 40
 QUESTIONS_PER_STUDENT = 20
 TEST_DURATION_SECONDS = 8 * 60
@@ -35,9 +35,10 @@ RESULTS_FILE = "glt302_results.csv"
 PASS_MARK = None  # Set in code only if the institution defines one.
 
 BATCHES = [
-    {"name": "Batch 1", "start": "09:00", "end": "09:30"},
-    {"name": "Batch 2", "start": "09:31", "end": "10:00"},
-    {"name": "Batch 3", "start": "10:01", "end": "10:30"},
+    {"name": "Batch 1", "start": "08:00", "end": "08:30", "size": 40},
+    {"name": "Batch 2", "start": "08:31", "end": "09:00", "size": 40},
+    {"name": "Batch 3", "start": "09:01", "end": "09:30", "size": 40},
+    {"name": "Batch 4", "start": "09:31", "end": "10:00", "size": 36},
 ]
 
 RESULT_COLUMNS = [
@@ -168,17 +169,29 @@ def normalise_matric(value):
     return str(value).strip().upper()
 
 
-def load_authorized_students():
-    """Load the actual 94-student allocation from Secrets.
+def build_default_authorized_students():
+    """Build the stated GLT 302 roster.
 
-    Accepted JSON forms:
-      {"FPA/BCH/25/3-0001":"Batch 1", ...}
-      [{"matric":"...","batch":"Batch 1"}, ...]
-      ["FPA/BCH/25/3-0001", ...]  # assigned sequentially to batches in listed order
+    The supplied allocation is 0001–0155 plus 0301 as the final student.
+    That produces 156 students, matching the requested 40+40+40+36 batches.
+    Batch 4 therefore contains 0121–0155 plus 0301.
     """
+    roster = [f"FPA/BC/25/3-{i:04d}" for i in range(1, 156)]
+    roster.append("FPA/BC/25/3-0301")
+    mapping = {}
+    cursor = 0
+    for batch in BATCHES:
+        for matric in roster[cursor:cursor + batch["size"]]:
+            mapping[matric] = batch["name"]
+        cursor += batch["size"]
+    return mapping
+
+
+def load_authorized_students():
+    """Load an optional explicit roster from Secrets, otherwise use the supplied roster."""
     raw, error = parse_json_secret("AUTHORIZED_STUDENTS_JSON")
     if error:
-        return {}, error
+        return build_default_authorized_students(), None
 
     mapping = {}
     try:
@@ -187,9 +200,13 @@ def load_authorized_students():
                 mapping[normalise_matric(matric)] = str(batch).strip()
         elif isinstance(raw, list):
             if all(isinstance(x, str) for x in raw):
-                for idx, matric in enumerate(raw):
-                    batch = BATCHES[min(idx // 32, 2)]["name"]
-                    mapping[normalise_matric(matric)] = batch
+                if len(raw) != TOTAL_STUDENTS:
+                    raise ValueError(f"Exactly {TOTAL_STUDENTS} authorized students are required; {len(raw)} were found.")
+                cursor = 0
+                for batch in BATCHES:
+                    for matric in raw[cursor:cursor + batch["size"]]:
+                        mapping[normalise_matric(matric)] = batch["name"]
+                    cursor += batch["size"]
             else:
                 for item in raw:
                     matric = normalise_matric(item.get("matric", item.get("Matric Number", "")))
@@ -203,7 +220,7 @@ def load_authorized_students():
         if len(mapping) != TOTAL_STUDENTS:
             raise ValueError(f"Exactly {TOTAL_STUDENTS} authorized students are required; {len(mapping)} were found.")
         if any(batch not in valid_names for batch in mapping.values()):
-            raise ValueError("Every student must be assigned to Batch 1, Batch 2, or Batch 3.")
+            raise ValueError("Every student must be assigned to Batch 1, Batch 2, Batch 3, or Batch 4.")
         if len(set(mapping)) != TOTAL_STUDENTS:
             raise ValueError("Duplicate matriculation numbers detected.")
         return mapping, None
@@ -248,8 +265,8 @@ def batch_access_status(batch_name, now=None):
 
 def validate_matric(matric):
     matric = normalise_matric(matric)
-    # FPA/BCH/25/3-0001 is 17 characters.
-    return bool(re.fullmatch(r"FPA/BCH/25/3-\d{4}", matric)) and len(matric) == 17
+    # FPA/BC/25/3-0001 is 16 characters.
+    return bool(re.fullmatch(r"FPA/BC/25/3-\d{4}", matric)) and len(matric) == 16
 
 # ============================================================
 # RESULTS / DUPLICATE SAFETY
@@ -396,11 +413,11 @@ with st.sidebar:
     st.caption(COURSE_TITLE)
     st.markdown("---")
     st.markdown("**Test Information**")
-    st.write(f"Date: **22 August 2026**")
+    st.write(f"Date: **21 August 2026**")
     st.write("Nigeria time: **Africa/Lagos**")
     st.write(f"Question Bank: **{TOTAL_QUESTION_BANK}**")
     st.write(f"Questions per Student: **{QUESTIONS_PER_STUDENT}**")
-    st.write("Duration: **8 minutes**")
+    st.write("Duration: **8 minutes per student**")
     st.write(f"Students: **{TOTAL_STUDENTS}**")
     st.markdown("---")
     st.markdown("**Batch Schedule**")
@@ -580,9 +597,10 @@ if st.session_state.lecturer_authenticated:
         st.subheader("Session Control")
         session_rows = [
             ("Course", COURSE_CODE), ("Course Title", COURSE_TITLE), ("Level", LEVEL),
-            ("Department", DEPARTMENT), ("Test Date", "Saturday, 22 August 2026"),
-            ("Overall Access", "9:00 AM – 10:30 AM"), ("Batch 1", "9:00 AM – 9:30 AM"),
-            ("Batch 2", "9:31 AM – 10:00 AM"), ("Batch 3", "10:01 AM – 10:30 AM"),
+            ("Department", DEPARTMENT), ("Test Date", "Friday, 21 August 2026"),
+            ("Overall Access", "8:00 AM – 10:00 AM"), ("Batch 1", "8:00 AM – 8:30 AM"),
+            ("Batch 2", "8:31 AM – 9:00 AM"), ("Batch 3", "9:01 AM – 9:30 AM"),
+            ("Batch 4", "9:31 AM – 10:00 AM"),
             ("Student Test Duration", "8 minutes"), ("Question Bank", "40 questions"),
             ("Questions per Student", "20 questions"), ("Automatic Refresh", "10 seconds"),
             ("Total Students", str(TOTAL_STUDENTS)),
@@ -627,8 +645,8 @@ if not st.session_state.exam_started:
 
     name = st.text_input("Student Name", placeholder="Enter your full name")
     gender = st.selectbox("Gender", ["Select Gender", "Male", "Female"])
-    matric = st.text_input("Matric Number", placeholder="FPA/BCH/25/3-0001", max_chars=17)
-    st.caption("Required format: FPA/BCH/25/3-0001 (17 characters)")
+    matric = st.text_input("Matric Number", placeholder="FPA/BC/25/3-0001", max_chars=16)
+    st.caption("MATRIC NUMBER: exactly 16 characters • Format: FPA/BC/25/3-0001")
 
     if st.button("🚀 Start Test", use_container_width=True):
         name = name.strip()
@@ -640,7 +658,7 @@ if not st.session_state.exam_started:
             st.error("Please select your gender.")
             st.stop()
         if not validate_matric(matric):
-            st.error("Invalid matriculation number. Use the complete 17-character format FPA/BCH/25/3-0001.")
+            st.error("Invalid matriculation number. Use the complete 16-character format FPA/BC/25/3-0001.")
             st.stop()
         if AUTH_ERROR:
             st.error("The authorized student allocation is not correctly configured. Please contact the lecturer.")
