@@ -456,7 +456,7 @@ with st.sidebar:
     st.caption(COURSE_TITLE)
     st.markdown("---")
     st.markdown("**Test Information**")
-    st.write(f"Date: **21 August 2026**")
+    st.write(f"Date: **22 August 2026**")
     st.write("Nigeria time: **Africa/Lagos**")
     st.write(f"Question Bank: **{TOTAL_QUESTION_BANK}**")
     st.write(f"Questions per Student: **{QUESTIONS_PER_STUDENT}**")
@@ -660,7 +660,7 @@ if st.session_state.lecturer_authenticated:
         st.subheader("Session Control")
         session_rows = [
             ("Course", COURSE_CODE), ("Course Title", COURSE_TITLE), ("Level", LEVEL),
-            ("Department", DEPARTMENT), ("Test Date", "Friday, 21 August 2026"),
+            ("Department", DEPARTMENT), ("Test Date", "Saturday, 22 August 2026"),
             ("Overall Access", "8:00 AM – 10:00 AM"), ("Batch 1", "8:00 AM – 8:30 AM"),
             ("Batch 2", "8:31 AM – 9:00 AM"), ("Batch 3", "9:01 AM – 9:30 AM"),
             ("Batch 4", "9:31 AM – 10:00 AM"),
