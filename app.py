@@ -62,7 +62,7 @@ st.markdown(
     """
     <style>
     .block-container {max-width: 1200px; padding-top: 1.5rem; padding-bottom: 2rem;}
-    .main-title {text-align:center; font-size:36px; font-weight:800; margin-bottom:2px;}
+    .main-title {text-align:center; font-size:36px; font-weight:800; line-height:1.35; margin-top:6px; margin-bottom:2px; padding-top:4px;}
     .main-subtitle {text-align:center; font-size:16px; margin-bottom:20px;}
     .timer-box {text-align:center; font-size:30px; font-weight:800; padding:10px; margin-bottom:8px;}
     .login-info {padding:14px 16px; border-radius:8px; margin-bottom:18px; background:#eef6ff;}
