@@ -390,3 +390,66 @@ Required format:
 `FPA/BC/25/3-0001`
 
 The application validates the complete 16-character format and rejects entries that do not match it.
+
+
+## Private Question Bank — IMPORTANT
+
+The authoritative GLT 302 question bank is the uploaded 40-question bank.
+
+**Do not place the questions or correct answers directly inside `app.py`.**
+
+Store the complete bank only in Streamlit Secrets under:
+
+`QUESTION_BANK_JSON`
+
+The secret contains the 40 questions, three options per question, and the `correct_answer` field. The application reads this secret server-side.
+
+Students are shown only:
+- the question;
+- options A, B and C.
+
+Students are never shown:
+- `correct_answer`;
+- the complete answer key;
+- the raw `QUESTION_BANK_JSON`;
+- lecturer/admin secret values.
+
+The application should select 20 questions from the private 40-question bank for each attempt. The selected question IDs are stored in the student's Streamlit session state so the 10-second refresh does not generate a different examination.
+
+### Streamlit Secrets format
+
+Use the `questions` array from the supplied bank:
+
+```toml
+QUESTION_BANK_JSON = '''
+[
+  {
+    "id": 1,
+    "question": "...",
+    "options": {
+      "A": "...",
+      "B": "...",
+      "C": "..."
+    },
+    "correct_answer": "A"
+  }
+]
+'''
+```
+
+Replace the example with the **complete 40-question bank supplied for this examination**.
+
+Do not commit `.streamlit/secrets.toml` to GitHub.
+
+### Security check
+
+Before deployment, verify:
+
+- [ ] `QUESTION_BANK_JSON` exists in Streamlit Secrets
+- [ ] It contains exactly 40 questions
+- [ ] Every question has exactly A, B and C
+- [ ] Every question has a valid `correct_answer`
+- [ ] No question text is hard-coded in public `app.py`
+- [ ] No correct answer is hard-coded in public `app.py`
+- [ ] Students cannot access Streamlit Secrets
+- [ ] Lecturer password is stored in Secrets

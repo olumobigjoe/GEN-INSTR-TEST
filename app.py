@@ -1,4 +1,9 @@
 import json
+
+# IMPORTANT: The 40-question bank and correct answers are stored only in
+# Streamlit Secrets (QUESTION_BANK_JSON). Do NOT put the questions or
+# answer key in this public source file.
+# Students receive only question text/options; correct answers remain server-side.
 import os
 import random
 import re
