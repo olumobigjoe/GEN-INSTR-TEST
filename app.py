@@ -97,11 +97,35 @@ for key, value in DEFAULTS.items():
 # PRIVATE CONFIGURATION / QUESTION BANK
 # ============================================================
 def secret_text(name, default=None):
+    """Read a Streamlit Secret using the exact configured key name."""
     try:
-        value = st.secrets[name]
-        return str(value)
+        if name in st.secrets:
+            value = st.secrets[name]
+            if value is None:
+                return default
+            return str(value).strip()
     except Exception:
-        return default
+        pass
+    return default
+
+
+def lecturer_password_from_secrets():
+    """Return the lecturer password from the canonical Secret key.
+
+    Canonical Streamlit Secret name:
+        LECTURER_PASSWORD
+
+    A lowercase fallback is accepted only to make deployment tolerant of
+    an existing `lecturer_password` Secret. The recommended/canonical
+    configuration remains `LECTURER_PASSWORD`.
+    """
+    password = secret_text("LECTURER_PASSWORD")
+    if password:
+        return password
+
+    # Backward-compatible fallback for an already-created lowercase secret.
+    password = secret_text("lecturer_password")
+    return password
 
 
 def parse_json_secret(name):
@@ -444,13 +468,16 @@ if st.session_state.show_lecturer_login and not st.session_state.lecturer_authen
     c1, c2 = st.columns(2)
     with c1:
         if st.button("🔐 Login", use_container_width=True):
-            correct_password = secret_text("LECTURER_PASSWORD")
+            correct_password = lecturer_password_from_secrets()
             if correct_password and password == correct_password:
                 st.session_state.lecturer_authenticated = True
                 st.session_state.show_lecturer_login = False
                 st.rerun()
             elif not correct_password:
-                st.error("LECTURER_PASSWORD is not configured in Streamlit Secrets.")
+                st.error(
+                    "Lecturer password is not configured in Streamlit Secrets. "
+                    "Add the exact key: LECTURER_PASSWORD"
+                )
             else:
                 st.error("Incorrect lecturer password.")
     with c2:
