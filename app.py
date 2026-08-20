@@ -29,7 +29,7 @@ COURSE_CODE = "GLT 302"
 COURSE_TITLE = "GENERAL INSTRUMENTATION"
 LEVEL = "HND 1"
 DEPARTMENT = "BIOCHEMISTRY"
-TEST_DATE = "2026-08-20"
+TEST_DATE = "2026-08-21"
 LOCAL_TIMEZONE = ZoneInfo("Africa/Lagos")
 TOTAL_STUDENTS = 156
 TOTAL_QUESTION_BANK = 40
@@ -40,7 +40,7 @@ RESULTS_FILE = "glt302_results.csv"
 PASS_MARK = None  # Set in code only if the institution defines one.
 
 BATCHES = [
-    {"name": "Batch 1", "start": "08:00", "end": "14:30", "size": 40},
+    {"name": "Batch 1", "start": "08:00", "end": "08:30", "size": 40},
     {"name": "Batch 2", "start": "08:31", "end": "09:00", "size": 40},
     {"name": "Batch 3", "start": "09:01", "end": "09:30", "size": 40},
     {"name": "Batch 4", "start": "09:31", "end": "10:00", "size": 36},
