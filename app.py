@@ -109,6 +109,34 @@ def secret_text(name, default=None):
     return default
 
 
+def safe_secret_diagnostics():
+    """Return non-sensitive deployment diagnostics."""
+    try:
+        keys = set(st.secrets.keys())
+    except Exception:
+        keys = set()
+    result = {
+        "LECTURER_PASSWORD": "configured" if "LECTURER_PASSWORD" in keys else "missing",
+        "lecturer_password": "configured" if "lecturer_password" in keys else "missing",
+        "QUESTION_BANK_JSON": "configured" if "QUESTION_BANK_JSON" in keys else "missing",
+        "AUTHORIZED_STUDENTS_JSON": "configured" if "AUTHORIZED_STUDENTS_JSON" in keys else "missing",
+    }
+    try:
+        raw = secret_text("QUESTION_BANK_JSON")
+        data = json.loads(raw) if raw else None
+        qs = data.get("questions", []) if isinstance(data, dict) else data
+        result["question_count"] = len(qs) if isinstance(qs, list) else "invalid"
+    except Exception:
+        result["question_count"] = "invalid"
+    try:
+        raw = secret_text("AUTHORIZED_STUDENTS_JSON")
+        data = json.loads(raw) if raw else None
+        result["student_count"] = len(data) if isinstance(data, dict) else "invalid"
+    except Exception:
+        result["student_count"] = "invalid"
+    return result
+
+
 def lecturer_password_from_secrets():
     """Return the lecturer password from the canonical Secret key.
 
@@ -466,24 +494,36 @@ if st.session_state.show_lecturer_login and not st.session_state.lecturer_authen
     st.markdown(f'<div class="main-subtitle">{COURSE_CODE} — {COURSE_TITLE}</div>', unsafe_allow_html=True)
     password = st.text_input("Lecturer Password", type="password")
     c1, c2 = st.columns(2)
+
     with c1:
         if st.button("🔐 Login", use_container_width=True):
             correct_password = lecturer_password_from_secrets()
+
             if correct_password and password == correct_password:
                 st.session_state.lecturer_authenticated = True
                 st.session_state.show_lecturer_login = False
                 st.rerun()
             elif not correct_password:
                 st.error(
-                    "Lecturer password is not configured in Streamlit Secrets. "
-                    "Add the exact key: LECTURER_PASSWORD"
+                    "Lecturer password is not available to this deployed app. "
+                    "Check Streamlit Settings → Secrets and use the exact key "
+                    "`LECTURER_PASSWORD`."
                 )
+                with st.expander("Safe deployment diagnostics"):
+                    d = safe_secret_diagnostics()
+                    st.write(f"LECTURER_PASSWORD: **{d['LECTURER_PASSWORD']}**")
+                    st.write(f"QUESTION_BANK_JSON: **{d['QUESTION_BANK_JSON']}**")
+                    st.write(f"AUTHORIZED_STUDENTS_JSON: **{d['AUTHORIZED_STUDENTS_JSON']}**")
+                    st.write(f"Question bank count: **{d['question_count']}**")
+                    st.write(f"Authorized student count: **{d['student_count']}**")
             else:
                 st.error("Incorrect lecturer password.")
+
     with c2:
         if st.button("← Back to Student Portal", use_container_width=True):
             st.session_state.show_lecturer_login = False
             st.rerun()
+
     st.stop()
 
 # ============================================================
