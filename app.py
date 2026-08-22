@@ -34,7 +34,7 @@ LOCAL_TIMEZONE = ZoneInfo("Africa/Lagos")
 TOTAL_STUDENTS = 156
 TOTAL_QUESTION_BANK = 40
 QUESTIONS_PER_STUDENT = 20
-TEST_DURATION_SECONDS = 8 * 60
+TEST_DURATION_SECONDS = 5 * 60
 AUTO_REFRESH_SECONDS = 10
 RESULTS_FILE = "glt302_results.csv"
 PASS_MARK = None  # Set in code only if the institution defines one.
@@ -460,7 +460,7 @@ with st.sidebar:
     st.write("Nigeria time: **Africa/Lagos**")
     st.write(f"Question Bank: **{TOTAL_QUESTION_BANK}**")
     st.write(f"Questions per Student: **{QUESTIONS_PER_STUDENT}**")
-    st.write("Duration: **8 minutes per student**")
+    st.write("Duration: **5 minutes per student**")
     st.write(f"Students: **{TOTAL_STUDENTS}**")
     st.markdown("---")
     st.markdown("**Batch Schedule**")
@@ -664,7 +664,7 @@ if st.session_state.lecturer_authenticated:
             ("Overall Access", "8:00 AM – 10:00 AM"), ("Batch 1", "8:00 AM – 8:30 AM"),
             ("Batch 2", "8:31 AM – 9:00 AM"), ("Batch 3", "9:01 AM – 9:30 AM"),
             ("Batch 4", "9:31 AM – 10:00 AM"),
-            ("Student Test Duration", "8 minutes"), ("Question Bank", "40 questions"),
+            ("Student Test Duration", "5 minutes"), ("Question Bank", "40 questions"),
             ("Questions per Student", "20 questions"), ("Automatic Refresh", "10 seconds"),
             ("Total Students", str(TOTAL_STUDENTS)),
         ]
